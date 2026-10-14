@@ -1,0 +1,977 @@
+{
+  "slug": "parallel-paragraph-reader",
+  "module": "parallel-paragraph-reader/src/reader",
+  "function": "buildReading",
+  "note": "Case function overrides select another exported pure function. DOM cases also run in test/e2e/reader.e2e.ts.",
+  "cases": [
+    {
+      "name": "A and X then B and Y",
+      "args": [
+        "A\n\nB",
+        "X\n\nY"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 0
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          },
+          {
+            "left": {
+              "text": "B",
+              "line": 2
+            },
+            "right": {
+              "text": "Y",
+              "line": 2
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "ten lines and one line retain the next row",
+      "args": [
+        "Line 0\nLine 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\n\nB",
+        "X\n\nY"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "Line 0\nLine 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9",
+              "line": 0
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          },
+          {
+            "left": {
+              "text": "B",
+              "line": 11
+            },
+            "right": {
+              "text": "Y",
+              "line": 2
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "extra left paragraph",
+      "args": [
+        "A\n\nB\n\nC",
+        "X\n\nY"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 0
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          },
+          {
+            "left": {
+              "text": "B",
+              "line": 2
+            },
+            "right": {
+              "text": "Y",
+              "line": 2
+            }
+          },
+          {
+            "left": {
+              "text": "C",
+              "line": 4
+            },
+            "right": null
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "extra right paragraph",
+      "args": [
+        "A",
+        "X\n\nY"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 0
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          },
+          {
+            "left": null,
+            "right": {
+              "text": "Y",
+              "line": 2
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "Arabic stays on the left",
+      "args": [
+        "مرحبا بالعالم",
+        "Hello world"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "مرحبا بالعالم",
+              "line": 0
+            },
+            "right": {
+              "text": "Hello world",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "YAML and code before first prose",
+      "args": [
+        "---\ntitle: Test\n---\n```js\nconst a=1\n```\n\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 7
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "row two opens line six after YAML",
+      "args": [
+        "---\ntitle: Test\n---\nA\n\nB",
+        "X\n\nY"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 3
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          },
+          {
+            "left": {
+              "text": "B",
+              "line": 5
+            },
+            "right": {
+              "text": "Y",
+              "line": 2
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "HTML image stays literal",
+      "args": [
+        "<img src=\"https://example.com/x\">",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "<img src=\"https://example.com/x\">",
+              "line": 0
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "101 blocks on left",
+      "args": [
+        "P\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP",
+        "X"
+      ],
+      "expected": {
+        "rows": [],
+        "error": "Size limit: use notes with at most 100 prose blocks and 1,000,000 characters each."
+      }
+    },
+    {
+      "name": "101 blocks on right",
+      "args": [
+        "A",
+        "P\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP"
+      ],
+      "expected": {
+        "rows": [],
+        "error": "Size limit: use notes with at most 100 prose blocks and 1,000,000 characters each."
+      }
+    },
+    {
+      "name": "empty notes",
+      "args": [
+        "",
+        ""
+      ],
+      "expected": {
+        "rows": [],
+        "error": null
+      }
+    },
+    {
+      "name": "empty left",
+      "args": [
+        "",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": null,
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "CRLF retains source lines",
+      "args": [
+        "A\r\n\r\nB",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 0
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          },
+          {
+            "left": {
+              "text": "B",
+              "line": 2
+            },
+            "right": null
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "heading excluded",
+      "args": [
+        "# Title\n\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 2
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "setext heading excluded",
+      "args": [
+        "Title\n=====\n\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 3
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "list and continuation excluded",
+      "args": [
+        "- list\n  continue\n\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 3
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "table excluded",
+      "args": [
+        "| H |\n| --- |\n| B |\n\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 4
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "blockquote excluded",
+      "args": [
+        "> quote\ncontinuation\n\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 3
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "indented code excluded",
+      "args": [
+        "    code\n    other\n\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 3
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "tilde fence excluded",
+      "args": [
+        "~~~\ncode\n~~~\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 3
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "short fence does not close long fence",
+      "args": [
+        "````\n```\nhidden\n````\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 4
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "unclosed fence excludes rest",
+      "args": [
+        "A\n\n```\nhidden",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 0
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "BOM frontmatter excluded",
+      "args": [
+        "﻿---\ntitle: test\n---\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 3
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "unclosed frontmatter is excluded",
+      "args": [
+        "---\ntitle: test",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": null,
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "blank whitespace separates blocks",
+      "args": [
+        "A\n \n\nB",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 0
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          },
+          {
+            "left": {
+              "text": "B",
+              "line": 3
+            },
+            "right": null
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "Markdown links stay literal",
+      "args": [
+        "[text](https://example.com)",
+        "[[Note]]"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "[text](https://example.com)",
+              "line": 0
+            },
+            "right": {
+              "text": "[[Note]]",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "name": "layout at 360 pixels",
+      "function": "layoutForWidth",
+      "args": [
+        360
+      ],
+      "expected": "stacked"
+    },
+    {
+      "name": "layout at 599 pixels",
+      "function": "layoutForWidth",
+      "args": [
+        599
+      ],
+      "expected": "stacked"
+    },
+    {
+      "name": "layout at 600 pixels",
+      "function": "layoutForWidth",
+      "args": [
+        600
+      ],
+      "expected": "columns"
+    },
+    {
+      "name": "layout at 1200 pixels",
+      "function": "layoutForWidth",
+      "args": [
+        1200
+      ],
+      "expected": "columns"
+    },
+    {
+      "name": "manual gap",
+      "function": "parseAlignment",
+      "args": [
+        "1,1\n2,-\n3,2",
+        3,
+        2
+      ],
+      "expected": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          null
+        ],
+        [
+          2,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "duplicate rejected",
+      "function": "parseAlignment",
+      "args": [
+        "1,1\n1,2",
+        2,
+        2
+      ],
+      "expected": null
+    },
+    {
+      "name": "omission rejected",
+      "function": "parseAlignment",
+      "args": [
+        "1,1",
+        2,
+        2
+      ],
+      "expected": null
+    },
+    {
+      "name": "reorder rejected",
+      "function": "parseAlignment",
+      "args": [
+        "2,1\n1,2",
+        2,
+        2
+      ],
+      "expected": null
+    },
+    {
+      "name": "empty row rejected",
+      "function": "parseAlignment",
+      "args": [
+        "-,-",
+        0,
+        0
+      ],
+      "expected": null
+    },
+    {
+      "name": "Pro restores a manual gap and selected row",
+      "function": "restorePair",
+      "args": [
+        [
+          {
+            "text": "A",
+            "line": 0
+          },
+          {
+            "text": "B",
+            "line": 2
+          }
+        ],
+        [
+          {
+            "text": "X",
+            "line": 0
+          }
+        ],
+        {
+          "stamp": "[[\"A\",\"B\"],[\"X\"]]",
+          "map": [
+            [
+              0,
+              null
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "row": 1
+        },
+        true
+      ],
+      "expected": {
+        "map": [
+          [
+            0,
+            null
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "row": 1,
+        "message": ""
+      }
+    },
+    {
+      "name": "Free ignores saved alignment and row",
+      "function": "restorePair",
+      "args": [
+        [
+          {
+            "text": "A",
+            "line": 0
+          },
+          {
+            "text": "B",
+            "line": 2
+          }
+        ],
+        [
+          {
+            "text": "X",
+            "line": 0
+          }
+        ],
+        {
+          "stamp": "[[\"A\",\"B\"],[\"X\"]]",
+          "map": [
+            [
+              0,
+              null
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "row": 1
+        },
+        false
+      ],
+      "expected": {
+        "map": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            null
+          ]
+        ],
+        "row": 0,
+        "message": ""
+      }
+    },
+    {
+      "name": "Changed prose rejects saved state",
+      "function": "restorePair",
+      "args": [
+        [
+          {
+            "text": "A",
+            "line": 0
+          },
+          {
+            "text": "B",
+            "line": 2
+          }
+        ],
+        [
+          {
+            "text": "X",
+            "line": 0
+          }
+        ],
+        {
+          "stamp": "old",
+          "map": [
+            [
+              0,
+              null
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "row": 1
+        },
+        true
+      ],
+      "expected": {
+        "map": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            null
+          ]
+        ],
+        "row": 0,
+        "message": "The prose changed. The saved map and row were not used. Review and save a new map."
+      }
+    },
+    {
+      "name": "Saved row is clamped to the map",
+      "function": "restorePair",
+      "args": [
+        [
+          {
+            "text": "A",
+            "line": 0
+          },
+          {
+            "text": "B",
+            "line": 2
+          }
+        ],
+        [
+          {
+            "text": "X",
+            "line": 0
+          }
+        ],
+        {
+          "stamp": "[[\"A\",\"B\"],[\"X\"]]",
+          "map": [
+            [
+              0,
+              null
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "row": 199
+        },
+        true
+      ],
+      "expected": {
+        "map": [
+          [
+            0,
+            null
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "row": 1,
+        "message": ""
+      }
+    },
+    {
+      "name": "Bad saved map falls back to order",
+      "function": "restorePair",
+      "args": [
+        [
+          {
+            "text": "A",
+            "line": 0
+          },
+          {
+            "text": "B",
+            "line": 2
+          }
+        ],
+        [
+          {
+            "text": "X",
+            "line": 0
+          }
+        ],
+        {
+          "stamp": "[[\"A\",\"B\"],[\"X\"]]",
+          "map": [
+            [
+              1,
+              0
+            ]
+          ],
+          "row": 1
+        },
+        true
+      ],
+      "expected": {
+        "map": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            null
+          ]
+        ],
+        "row": 1,
+        "message": ""
+      }
+    },
+    {
+      "name": "multiline setext heading excluded",
+      "args": [
+        "Title line one\nTitle line two\n=====\n\nA",
+        "X"
+      ],
+      "expected": {
+        "rows": [
+          {
+            "left": {
+              "text": "A",
+              "line": 4
+            },
+            "right": {
+              "text": "X",
+              "line": 0
+            }
+          }
+        ],
+        "error": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "feature": "choose-notes",
+    "caption": "Choose two Markdown notes.",
+    "note": "English.md",
+    "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); await p.openPair('Parallel Paragraph Reader/English.md','Parallel Paragraph Reader/French.md'); window.__pprPicker=p.chooseNotes();return 'ok'; })()",
+    "after": "window.__pprPicker.close(); 'ok'"
+  },
+  {
+    "feature": "matched-rows",
+    "caption": "Read English and French in shared rows.",
+    "note": "English.md",
+    "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); await p.openPair('Parallel Paragraph Reader/English.md','Parallel Paragraph Reader/French.md'); return 'ok'; })()"
+  },
+  {
+    "feature": "extra-blocks",
+    "caption": "An extra English paragraph has an empty French cell.",
+    "note": "English.md",
+    "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); await p.openPair('Parallel Paragraph Reader/English.md','Parallel Paragraph Reader/French.md'); const v=[...p.views].filter(v=>v.contentEl.isConnected).pop(); await v.selectRow(3); v.contentEl.querySelector('[data-row=\"3\"]').scrollIntoView({block:'center'});return 'ok'; })()"
+  },
+  {
+    "feature": "narrow-screen",
+    "caption": "Each pair stacks in a narrow pane.",
+    "note": "English.md",
+    "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); await p.openPair('Parallel Paragraph Reader/English.md','Parallel Paragraph Reader/French.md'); const v=[...p.views].filter(v=>v.contentEl.isConnected).pop(); v.contentEl.style.width='360px'; v.contentEl.style.maxWidth='360px'; v.onResize();return 'ok'; })()",
+    "after": "[...app.plugins.plugins['parallel-paragraph-reader'].views].forEach(v=>{v.contentEl.style.width='';v.contentEl.style.maxWidth='';}); 'ok'"
+  },
+  {
+    "feature": "source-note",
+    "caption": "Open the selected paragraph in its source note.",
+    "note": "English.md",
+    "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); await p.openPair('Parallel Paragraph Reader/English.md','Parallel Paragraph Reader/French.md'); const v=[...p.views].filter(v=>v.contentEl.isConnected).pop(); await v.openSource(v.left,v.leftBlocks[1],1);return 'ok'; })()"
+  },
+  {
+    "feature": "text-direction",
+    "caption": "Arabic and English keep their cell directions.",
+    "note": "Arabic.md",
+    "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); await p.openPair('Parallel Paragraph Reader/Arabic.md','Parallel Paragraph Reader/English.md'); return 'ok'; })()"
+  },
+  {
+    "feature": "literal-text",
+    "caption": "HTML is visible as text in the reader.",
+    "note": "English.md",
+    "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); await p.openPair('Parallel Paragraph Reader/Literal.md','Parallel Paragraph Reader/French.md'); return 'ok'; })()"
+  },
+  {
+    "feature": "saved-alignment",
+    "caption": "Pro saves a manual alignment map.",
+    "note": "English.md",
+    "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); p.pro.opts.http=async()=>({status:200,json:{data:{viewer:{login:'demo-reader'},user:{sponsorshipForViewerAsSponsor:{isActive:true,isOneTimePayment:false,tier:{name:'$5 a month',monthlyPriceInCents:500}}}}}}); app.secretStorage.setSecret('parallel-paragraph-reader-github-token','gho_'+'0'.repeat(36)); await p.pro.refreshNow(); await p.openPair('Parallel Paragraph Reader/English.md','Parallel Paragraph Reader/French-gap.md'); const v=[...p.views].filter(v=>v.contentEl.isConnected).pop(); await v.saveAlignment([[0,0],[1,null],[2,1],[3,2]]);return 'ok'; })()",
+    "after": "(async()=>{ app.plugins.plugins['parallel-paragraph-reader'].pro.signOut(); return 'ok'; })()"
+  },
+  {
+    "feature": "last-row",
+    "caption": "Pro restores the selected row for a pair.",
+    "note": "English.md",
+    "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); p.pro.opts.http=async()=>({status:200,json:{data:{viewer:{login:'demo-reader'},user:{sponsorshipForViewerAsSponsor:{isActive:true,isOneTimePayment:false,tier:{name:'$5 a month',monthlyPriceInCents:500}}}}}}); app.secretStorage.setSecret('parallel-paragraph-reader-github-token','gho_'+'0'.repeat(36)); await p.pro.refreshNow(); await p.openPair('Parallel Paragraph Reader/English.md','Parallel Paragraph Reader/French-gap.md'); const v=[...p.views].filter(v=>v.contentEl.isConnected).pop(); await v.selectRow(2); await v.reload();return 'ok'; })()",
+    "after": "(async()=>{ app.plugins.plugins['parallel-paragraph-reader'].pro.signOut(); return 'ok'; })()"
+  },
+  {
+    "feature": "reading-tour",
+    "caption": "Choose a pair, mark a row, and read another language.",
+    "frames": [
+      {
+        "note": "English.md",
+        "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); await p.openPair('Parallel Paragraph Reader/English.md','Parallel Paragraph Reader/French.md'); return 'ok'; })()",
+        "hold": 1200
+      },
+      {
+        "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; const v=[...p.views].filter(v=>v.contentEl.isConnected).pop(); await v.selectRow(1);return 'ok'; })()",
+        "hold": 1200
+      },
+      {
+        "note": "Arabic.md",
+        "eval": "(async()=>{ const p=app.plugins.plugins['parallel-paragraph-reader']; p.pro.signOut(); await p.openPair('Parallel Paragraph Reader/Arabic.md','Parallel Paragraph Reader/English.md'); return 'ok'; })()",
+        "hold": 1200
+      }
+    ]
+  }
+]
