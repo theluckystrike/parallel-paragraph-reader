@@ -4,6 +4,8 @@ import type { SponsorsManager } from './license/index';
 import { SPONSORS, bindPro, resetPro } from './pro';
 import { DEFAULT_SETTINGS, normalizeSettings, ReaderSettingTab, type ReaderSettings } from './settings';
 import { ReaderView, VIEW_ID } from './view';
+import { setupHello } from './hello/index';
+import WHATS_NEW from './whats-new.json';
 
 class NotePicker extends FuzzySuggestModal<TFile> {
 	constructor(private reader: ParallelParagraphReaderPlugin, title: string, private choose: (file: TFile) => void) { super(reader.app); this.setPlaceholder(title); }
@@ -18,6 +20,8 @@ export default class ParallelParagraphReaderPlugin extends Plugin {
 	readonly views = new Set<ReaderView>();
 	private writes: Promise<void> = Promise.resolve();
 	async onload(): Promise<void> {
+		// First: "What's new" reads its state before the settings load (packages/hello). It does not wait.
+		setupHello(this, WHATS_NEW);
 		await this.loadSettings();
 		const pro = createGitHubSponsors(this.app, this.manifest.id, SPONSORS, this);
 		pro.init(); this.pro = pro; bindPro(pro);

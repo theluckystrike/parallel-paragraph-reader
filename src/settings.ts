@@ -3,6 +3,7 @@ import { sponsorsSettingItems } from './license/github-obsidian';
 import { PRO_UI } from './pro';
 import type ParallelParagraphReaderPlugin from './main';
 import { validAlignment, type Alignment } from './reader';
+import { helloSettingItems } from './hello/settings';
 
 export interface SavedPair { stamp: string; map: Alignment | null; row: number }
 export interface ReaderSettings { pairs: Record<string, SavedPair> }
@@ -30,6 +31,11 @@ export function normalizeSettings(value: unknown): ReaderSettings {
 export class ReaderSettingTab extends PluginSettingTab {
 	constructor(private reader: ParallelParagraphReaderPlugin) { super(reader.app, reader); }
 	getSettingDefinitions(): SettingDefinitionItem[] {
+		// The product rows, then the "More from NoteMods" card (packages/hello).
+		return [...this.productSettingDefinitions(), ...helloSettingItems()];
+	}
+
+	productSettingDefinitions(): SettingDefinitionItem[] {
 		return [
 			{ name: 'Reading pane', desc: 'Choose two notes from the command palette. Use Reload notes after a source edit. Notes are read as plain text.' },
 			...(this.reader.pro ? sponsorsSettingItems(this.reader.pro, PRO_UI) : []),

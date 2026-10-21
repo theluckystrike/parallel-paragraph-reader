@@ -70,6 +70,8 @@ Start with short passages whose paragraph order is similar. Choose the original 
 
 ## Settings
 
+After a minor or major update, this plugin opens one What's new tab in the background. The tab and settings card suggest other NoteMods plugins and Zovo Chat and link to notemods.com for feedback ([privacy](https://notemods.com/privacy/)). The tab sends no data. Turn the tab off in Settings.
+
 The settings tab contains the GitHub Sponsors controls and Clear saved pairs. That button removes local maps and row positions, then reloads open reader panes. There is no font setting; text uses the vault theme. Source edits appear after Reload notes. Saved pair data can contain note paths and prose text used to check whether a map is still valid. Treat plugin data as part of your vault backup.
 
 ## FAQ
