@@ -1,7 +1,6 @@
 {
 	"name": "parallel-paragraph-reader",
-	"repository": {"type": "git", "url": "theluckystrike/parallel-paragraph-reader.git"},
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"private": true,
 	"description": "Read two existing language versions in matched paragraph rows.",
 	"main": "main.js",

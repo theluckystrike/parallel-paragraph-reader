@@ -1,6 +1,6 @@
 import { ItemView, MarkdownView, Modal, Notice, type ViewStateResult, type WorkspaceLeaf } from 'obsidian';
 import type ParallelParagraphReaderPlugin from './main';
-import { isPro } from './pro';
+import { isPro, proNotice } from './pro';
 import { alignmentText, buildReading, contentStamp, layoutForWidth, pairInOrder, pairKey, parseAlignment, restorePair, validAlignment, type Alignment, type Paragraph, type ReadingRow } from './reader';
 
 export const VIEW_ID = 'parallel-paragraph-reader';
@@ -161,7 +161,7 @@ export class ReaderView extends ItemView {
 	}
 	private requirePro(): boolean {
 		if (isPro()) return true;
-		new Notice('This is a pro feature. Sponsor on GitHub, then sign in from the plugin settings.'); return false;
+		proNotice('This is a pro feature.'); return false;
 	}
 	async saveAlignment(map: Alignment): Promise<boolean> {
 		if (!this.requirePro() || !this.rows.length || !validAlignment(map, this.leftBlocks.length, this.rightBlocks.length)) return false;
